@@ -16,6 +16,23 @@ export TOKEN="eyJhbGciOiJSUzI1NiIs..."
 
 # If you have a kubeconfig file:
 export KUBECONFIG=/path/to/kubeconfig.yaml
+
+# Get a short-lived token (valid 15 minutes)
+aws eks get-token --cluster-name MY-CLUSTER --region us-east-1 | jq -r '.status.token'
+
+# Or use it directly:
+export TOKEN=$(aws eks get-token --cluster-name MY-CLUSTER --region us-east-1 | jq -r '.status.token')
+```
+
+## From kubeconfig (already configured)
+
+```bash
+# If aws cli is configured as the exec provider in kubeconfig:
+kubectl config view --minify --raw -o jsonpath='{.users[0].user.exec}'
+# This shows the exec command that generates tokens on the fly
+
+# To extract a one-time token:
+export TOKEN=$(aws eks get-token --cluster-name MY-CLUSTER | jq -r '.status.token')
 ```
 
 ---
@@ -221,4 +238,4 @@ done
 | Secret Env Vars | Pods with hardcoded secrets |
 | kube-system Pods | System components to hijack |
 
-**After recon → proceed to [02-EXPLOIT-COMMANDS.md](02-EXPLOIT-COMMANDS.md) for exploitation.**
+**After recon → proceed to [EXPLOIT-COMMANDS.md](02-EXPLOIT-COMMANDS.md) for exploitation.**
